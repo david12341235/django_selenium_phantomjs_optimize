@@ -1,16 +1,21 @@
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from django.contrib.auth import hashers
+import autofixture
 
 
 class AdminTest(LiveServerTestCase):
-    fixtures = ['fixtures/one_user_logged_in.json']
-    
     def setUp(self):
-        self.browser = webdriver.PhantomJS()
+        u = autofixture.create_one('auth.User', generate_fk=True,
+                                   field_values={'password': hashers.make_password('password')})
+        u.save()
 
         # add session cookie for logged-in user
-        self.browser.add_cookie({u'domain': u'127.0.0.1', u'name': u'sessionid',
-                                 u'value': u'en7bsoxribtozhk7gewvwld1ncvpubem',
+        self.client.login(username=u.username, password='password')
+
+        self.browser = webdriver.PhantomJS()
+        self.browser.add_cookie({u'domain': u'localhost', u'name': u'sessionid',
+                                 u'value': self.client.session.session_key,
                                  u'path': u'/', u'httponly': True, u'secure': False})
 
     def tearDown(self):
