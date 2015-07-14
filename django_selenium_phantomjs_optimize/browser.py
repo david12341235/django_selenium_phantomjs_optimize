@@ -8,6 +8,11 @@ browser = []
 
 
 def instance():
+    # other browsers can be set here, eg
+    # webdriver.Firefox()
+    # Firefox, however, requires you to load a page in the
+    # domain before setting a cookie, with eg:
+    # instance().get(self.live_server_url)
     if len(browser) < 1:
         browser.append(webdriver.PhantomJS())
     return browser[0]
@@ -23,9 +28,6 @@ class SignedInTest(LiveServerTestCase):
         u = autofixture.create_one('auth.User', generate_fk=True,
                                    field_values={'password': hashers.make_password('password')})
         u.save()
-
-        # other browsers can be set here, eg
-        # self.browser = webdriver.Firefox()
 
         # add session cookie for logged-in user
         self.client.login(email=u.email, password='password')
