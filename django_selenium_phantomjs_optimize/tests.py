@@ -1,7 +1,7 @@
 import browser
 
 
-def teardown():
+def tearDown():
     browser.close()
 
 
